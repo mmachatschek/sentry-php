@@ -39,6 +39,11 @@ install:
     - if [ "$dependencies" = "lowest" ]; then composer update --no-interaction --no-suggest --prefer-lowest --prefer-dist; fi;
     - if [ "$dependencies" = "highest" ]; then composer update --no-interaction --no-suggest --prefer-dist; fi;
 
+before_script:
+    - phpenv config-rm xdebug.ini
+    - if [ "$TRAVIS_PHP_VERSION" != "nightly" ]; then echo "xdebug.default_enable=false\nxdebug.coverage_enable=true" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi;
+    - if [ "$TRAVIS_PHP_VERSION" = "nightly" ]; then echo 'xdebug.mode=coverage' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi;
+
 script: >-
     vendor/bin/phpunit --coverage-clover=build/coverage-report.xml &&
     bash <(curl -s https://codecov.io/bash) -f build/coverage-report.xml

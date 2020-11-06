@@ -265,7 +265,8 @@ final class ErrorHandler
      */
     private function handleError(int $level, string $message, string $file, int $line, ?array $errcontext = []): bool
     {
-        if (0 === error_reporting()) {
+        // PHP 8 Fix https://github.com/php/php-src/blob/php-8.0.0RC3/UPGRADING#L62
+        if ((\PHP_VERSION_ID >= 80000 && !(error_reporting() & $level)) || 0 === error_reporting()) {
             $errorAsException = new SilencedErrorException(self::ERROR_LEVELS_DESCRIPTION[$level] . ': ' . $message, 0, $level, $file, $line);
         } else {
             $errorAsException = new \ErrorException(self::ERROR_LEVELS_DESCRIPTION[$level] . ': ' . $message, 0, $level, $file, $line);
